@@ -1,7 +1,7 @@
 package armory
 
 import (
-	"armory/contracts"
+	"armory/onchain"
 	"context"
 	"crypto/ecdsa"
 	"database/sql"
@@ -18,7 +18,7 @@ import (
 type Service struct {
 	ethRPC *ethclient.Client
 	db     *DB
-	*contracts.WithdrawalQueueSession
+	*onchain.WithdrawalQueueSession
 	ownerAddr common.Address
 	ownerKey  *ecdsa.PrivateKey
 }
@@ -61,7 +61,7 @@ func (s *Service) RequestWithdrawal(ctx context.Context, userAddress common.Addr
 		return fmt.Errorf("create permit input: %w", err)
 	}
 
-	contractPermitInput := contracts.WithdrawalQueuePermitInput{
+	contractPermitInput := onchain.WithdrawalQueuePermitInput{
 		Value:    permitInput.Value,
 		Deadline: permitInput.Deadline,
 		V:        permitInput.V,

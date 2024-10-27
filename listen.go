@@ -1,7 +1,7 @@
 package armory
 
 import (
-	"armory/contracts"
+	"armory/onchain"
 	"context"
 	"fmt"
 	"log/slog"
@@ -12,14 +12,14 @@ import (
 )
 
 type Listener struct {
-	WithdrawalQueueFilterer *contracts.WithdrawalQueueFilterer
-	LidoFilterer            *contracts.LidoFilterer
+	WithdrawalQueueFilterer *onchain.WithdrawalQueueFilterer
+	LidoFilterer            *onchain.LidoFilterer
 	OwnerAddr               common.Address
 }
 
 func NewListener(
-	withdrawalQueueFilterer *contracts.WithdrawalQueueFilterer,
-	lidoFilterer *contracts.LidoFilterer,
+	withdrawalQueueFilterer *onchain.WithdrawalQueueFilterer,
+	lidoFilterer *onchain.LidoFilterer,
 	ownerAddr common.Address,
 ) *Listener {
 	return &Listener{
@@ -78,7 +78,7 @@ func (l *Listener) ListenForSubmitteds(ctx context.Context, optionFns ...WatchOp
 		optFn(opts)
 	}
 
-	sink := make(chan *contracts.LidoSubmitted)
+	sink := make(chan *onchain.LidoSubmitted)
 	sub, err := l.LidoFilterer.WatchSubmitted(nil, sink, opts.FilterSenders)
 	if err != nil {
 		return fmt.Errorf("watch submitted: %w", err)
@@ -110,7 +110,7 @@ func (l *Listener) ListenForWithdrawalRequests(ctx context.Context, optionFns ..
 	for _, optFn := range optionFns {
 		optFn(opts)
 	}
-	sink := make(chan *contracts.WithdrawalQueueWithdrawalRequested)
+	sink := make(chan *onchain.WithdrawalQueueWithdrawalRequested)
 	sub, err := l.WithdrawalQueueFilterer.WatchWithdrawalRequested(nil, sink, nil, opts.FilterRequesters, opts.FilterOwners)
 	if err != nil {
 		return fmt.Errorf("watch withdrawal requested: %w", err)
@@ -141,7 +141,7 @@ func (l *Listener) ListenForWithdrawalFinalisations(ctx context.Context, optionF
 	for _, optFn := range optionFns {
 		optFn(opts)
 	}
-	sink := make(chan *contracts.WithdrawalQueueWithdrawalsFinalized)
+	sink := make(chan *onchain.WithdrawalQueueWithdrawalsFinalized)
 	sub, err := l.WithdrawalQueueFilterer.WatchWithdrawalsFinalized(nil, sink, opts.FilterFrom, opts.FilterTo)
 	if err != nil {
 		return fmt.Errorf("watch withdrawal finalized: %w", err)
@@ -173,7 +173,7 @@ func (l *Listener) ListenForWithdrawalClaimeds(ctx context.Context, optionFns ..
 	for _, optFn := range optionFns {
 		optFn(opts)
 	}
-	sink := make(chan *contracts.WithdrawalQueueWithdrawalClaimed)
+	sink := make(chan *onchain.WithdrawalQueueWithdrawalClaimed)
 	sub, err := l.WithdrawalQueueFilterer.WatchWithdrawalClaimed(nil, sink, nil, opts.FilterOwners, nil)
 	if err != nil {
 		return fmt.Errorf("watch withdrawal claimed: %w", err)
@@ -325,19 +325,19 @@ func (l *Listener) BackfillWithdrawalClaimeds(ctx context.Context, from uint64, 
 	return nil
 }
 
-func (l *Listener) ProcessSubmitteds(in *contracts.LidoSubmitted) error {
+func (l *Listener) ProcessSubmitteds(in *onchain.LidoSubmitted) error {
 	slog.Info("submitted", "index", in.Raw.Index, "tx", in.Raw.TxHash.String(), "sender", in.Sender.Hex(), "amount", in.Amount.String())
 	return nil
 }
-func (l *Listener) ProcessWithdrawalRequests(in *contracts.WithdrawalQueueWithdrawalRequested) error {
+func (l *Listener) ProcessWithdrawalRequests(in *onchain.WithdrawalQueueWithdrawalRequested) error {
 	slog.Info("withdrawal requested", "index", in.Raw.Index, "tx", in.Raw.TxHash.String(), "requester", in.Requestor.Hex(), "owner", in.Owner.Hex(), "amount_shares", in.AmountOfShares.String(), "amount_steth", in.AmountOfStETH.String())
 	return nil
 }
-func (l *Listener) ProcessWithdrawalFinalisations(in *contracts.WithdrawalQueueWithdrawalsFinalized) error {
+func (l *Listener) ProcessWithdrawalFinalisations(in *onchain.WithdrawalQueueWithdrawalsFinalized) error {
 	slog.Info("withdrawal finalized", "from", in.From.String(), "to", in.To.String(), "eth_locked", in.AmountOfETHLocked.String(), "shares_to_burn", in.SharesToBurn.String())
 	return nil
 }
-func (l *Listener) ProcessWithdrawalClaimeds(in *contracts.WithdrawalQueueWithdrawalClaimed) error {
+func (l *Listener) ProcessWithdrawalClaimeds(in *onchain.WithdrawalQueueWithdrawalClaimed) error {
 	slog.Info("withdrawal claimed", "index", in.Raw.Index, "tx", in.Raw.TxHash.String(), "receiver", in.Receiver.Hex(), "amount_eth", in.AmountOfETH.String())
 	return nil
 }

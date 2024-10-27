@@ -2,7 +2,7 @@ package armory_test
 
 import (
 	"armory"
-	"armory/contracts"
+	"armory/onchain"
 	"context"
 	"os"
 	"testing"
@@ -13,7 +13,7 @@ import (
 	"github.com/test-go/testify/require"
 )
 
-func PrepareRPC(t *testing.T) (*ethclient.Client, *contracts.WithdrawalQueueFilterer, *contracts.LidoFilterer) {
+func PrepareRPC(t *testing.T) (*ethclient.Client, *onchain.WithdrawalQueueFilterer, *onchain.LidoFilterer) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode.")
 	}
@@ -22,11 +22,11 @@ func PrepareRPC(t *testing.T) (*ethclient.Client, *contracts.WithdrawalQueueFilt
 	require.NoError(t, err)
 
 	withdrawalQueueAddr := "0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1"
-	withdrawalQueue, err := contracts.NewWithdrawalQueueFilterer(common.HexToAddress(withdrawalQueueAddr), executionRPC)
+	withdrawalQueue, err := onchain.NewWithdrawalQueueFilterer(common.HexToAddress(withdrawalQueueAddr), executionRPC)
 	require.NoError(t, err)
 
 	lidoAddr := "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"
-	lido, err := contracts.NewLidoFilterer(common.HexToAddress(lidoAddr), executionRPC)
+	lido, err := onchain.NewLidoFilterer(common.HexToAddress(lidoAddr), executionRPC)
 	require.NoError(t, err)
 
 	return executionRPC, withdrawalQueue, lido
