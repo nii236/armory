@@ -1,15 +1,15 @@
-# Armory Package
+# Armory - A Game Wallet System for Blockchain Games
 
-This package provides a service to manage user withdrawals, balances, and yield for an Ethereum-based game wallet system. It includes functions for managing user collateral and facilitating controlled balance withdrawals to user wallets, while tracking yield and collateral growth.
+Armory is an accounting system that bridges blockchain and in-game accounts. A user's deposited collateral is converted to an LST or LRT, and the yield is stored in a global yield pool.
 
-## Key Functions
+![](./armory_flow.png)
 
-- **RequestWithdrawal**: Initiates a withdrawal request from the user's balance to their wallet. Only non-yield funds are withdrawn.
-- **Balance**: Retrieves the user's current game wallet balance.
-- **BalanceSeconds**: Calculates the user's balance in "eth seconds" for tracking collateral value.
-- **Yield**: Fetches the yield accumulated on the user’s collateral.
-- **Wallet**: Returns an existing wallet or creates a new one if it doesn't exist.
+The idea is to enable blockchain-based games to have a more sustainable economy by having true value backing the game token via the global yield pool.
 
-### Notes
+The user:
 
-This package is currently under development, and some features may not be fully functional.
+- Deposits their funds into the game wallet.
+- Receives game token income for their deposited collateral.
+- Withdraws their original collateral at any time (with a ~5 day wait).
+- Spends the game token in-game to increase their competitive advantage.
+- Burns the game token to claim from the global yield pool.
